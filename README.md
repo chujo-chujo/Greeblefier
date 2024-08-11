@@ -15,6 +15,7 @@ You can take advantage of the option to __save and load presets__ to speed up yo
 
 ![](/_readme/presets.png)
 <br />
+<br />
 
 ## How to use it
 
@@ -34,6 +35,7 @@ You can take advantage of the option to __save and load presets__ to speed up yo
 By using the presets, the app can be conveniently used to quickly add large areas of snow (and then just fine tune the details in an image editor).
 
 ![](/_readme/snow.png)
+<br />
 <br />
 
 ## TODOs
