@@ -17,7 +17,6 @@ def rgb_to_hex(rgb_tuple):
 	elif len(rgb_tuple) != 3:
 		raise Exception("Only len(input) == 3 allowed.")
 	else:
-		# return '#%02x%02x%02x' % rgb_tuple
 		return f'#{rgb_tuple[0]:02x}{rgb_tuple[1]:02x}{rgb_tuple[2]:02x}'
 
 def hex_to_rgb(hex_string):
@@ -366,7 +365,6 @@ class Greeblefier(tk.Tk):
 		if file_path:
 			try:
 				self.image      = Image.open(file_path).convert("RGB")    # TODO: IMPLEMENT RGBA
-				# self.image_data = self.image.load()
 				self.zoom_level = self.default_zoom_level
 				if self.target_color:
 					self.update_preview()
@@ -695,11 +693,6 @@ class Greeblefier(tk.Tk):
 		if self.image:
 			self.update_preview()
 
-	# def set_all_values(self, values):
-	# 	for i, entry in enumerate(self.list_of_all_entries):
-	# 		entry.delete(0, tk.END)
-	# 		entry.insert(0, values[i])
-
 	def update_color_label(self, event, entry, label):
 		self.focus_set()
 		s = entry.get()
@@ -746,11 +739,7 @@ class Greeblefier(tk.Tk):
 
 	def save_preset_to_file(self, dict_of_presets):
 		# Save the dict of presets as a formatted string
-		prefix = """# Dictionary of saved presets.
-# You can edit the database manually, but be mindful
-# not to disrupt the syntax of round (), square [] and curly brackets{}.
-
-"""
+		prefix = "# Dictionary of saved presets.\n# You can edit the database manually, but be mindful\n# not to disrupt the syntax of round (), square [] and curly brackets{}."
 		formatted_dict = pprint.pformat(dict_of_presets, indent=4)
 		with open("greeblefier_GUI_files/presets.py", "w") as file:
 			file.write(prefix + "dict_of_presets = {" + "\n " +  formatted_dict[1:])
@@ -781,7 +770,7 @@ class Greeblefier(tk.Tk):
 	def insert_image_from_clipboard(self, *args):
 		try:
 			clipboard_image = ImageGrab.grabclipboard()
-			# Test if image was in clipboard
+			# Test if image in clipboard
 			if isinstance(clipboard_image, Image.Image):
 				self.image = clipboard_image.convert("RGB")		# TODO: IMPLEMENT RGBA
 				self.image_name = "new_image"
@@ -839,7 +828,7 @@ class Greeblefier(tk.Tk):
 
 
 if __name__ == '__main__':
-	Greeblefier(default_zoom=4, maximize_window=True, ask_to_exit=False)
+	Greeblefier(default_zoom=4, maximize_window=True, ask_to_exit=True)
 
 
 
