@@ -43,3 +43,8 @@ By using the presets, the app can be conveniently used to quickly add large area
 - implement RGBA support
 - fix problems with pixel coordinates: after zooming in/out, especially when the GUI window isn't maximized (for now solved by a restart)
 - create sets of premade presets + their management in the program
+<br />
+
+## Contact
+
+@chujo on OpenTTD's Discord ([discord.gg/openttd](https://discord.gg/openttd))
