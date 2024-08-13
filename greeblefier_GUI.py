@@ -520,18 +520,29 @@ class Greeblefier(tk.Tk):
 		# Convert probs from 0-100 % to 0.00-1.00
 		probabilities_of_greeble = [x/100 for x in probabilities_of_greeble]
 
-		self.greebled_image    = self.image.copy()
-		greebled_image_data    = self.greebled_image.load()
-		self.export_image      = self.image.copy()
-		self.export_image_data = []
-		for y in range(0, self.image.height):
-			for x in range(0, self.image.width):
-				if greebled_image_data[x, y] == self.target_color:
-					n = np.random.choice(len(colors_of_greeble), p=probabilities_of_greeble)
-					greebled_image_data[x, y] = colors_of_greeble[n]
-					self.export_image_data.append(colors_of_greeble[n] + (255,))
-				else:
-					self.export_image_data.append((255, 255, 255, 0))
+		self.greebled_image = self.image.copy()
+		self.export_image   = self.image.copy().convert("RGBA")
+
+		image_np        = np.array(self.image)
+		export_image_np = np.array(self.export_image)
+
+		mask = (image_np[:, :, 0] == self.target_color[0]) & \
+			   (image_np[:, :, 1] == self.target_color[1]) & \
+			   (image_np[:, :, 2] == self.target_color[2])
+		mask_inverted = ~mask
+
+		# Make coordinates (rows, columns) of matching indices into two arrays
+		matching_indices = np.where(mask)
+		matching_indices_inverted = np.where(mask_inverted)
+
+		random_color_index = np.random.choice(len(colors_of_greeble), size=len(matching_indices[0]), p=probabilities_of_greeble)
+		for i, color_index in enumerate(random_color_index):
+			image_np[matching_indices[0][i], matching_indices[1][i], :] = colors_of_greeble[color_index]
+			export_image_np[matching_indices[0][i], matching_indices[1][i], :] = colors_of_greeble[color_index] + (255,)
+		export_image_np[matching_indices_inverted] = (255, 255, 255, 0)
+		
+		self.greebled_image = Image.fromarray(image_np)
+		self.export_image   = Image.fromarray(export_image_np)
 
 	def get_tuple_from_str(self, entry):
 		s = entry.get()
@@ -552,10 +563,8 @@ class Greeblefier(tk.Tk):
 			return "break"
 		else:
 			if self.checkbox_var.get() == 1:
-				export_image = Image.new("RGBA", self.image.size)
-				export_image.putdata(self.export_image_data)
 				file_path = filedialog.asksaveasfilename(filetypes = [('PNG files', '*.png'), ('All files', '*.*')], defaultextension = '*.png', initialfile=self.image_name+"_")
-				if file_path: export_image.save(file_path)
+				if file_path: self.export_image.save(file_path)
 			elif self.checkbox_var.get() == 0:
 				file_path = filedialog.asksaveasfilename(filetypes = [('PNG files', '*.png'), ('All files', '*.*')], defaultextension = '*.png', initialfile=self.image_name+"_edited")
 				if file_path: self.greebled_image.save(file_path)
@@ -739,7 +748,7 @@ class Greeblefier(tk.Tk):
 
 	def save_preset_to_file(self, dict_of_presets):
 		# Save the dict of presets as a formatted string
-		prefix = "# Dictionary of saved presets.\n# You can edit the database manually, but be mindful\n# not to disrupt the syntax of round (), square [] and curly brackets{}."
+		prefix = "# Dictionary of saved presets.\n# You can edit the database manually, but be mindful\n# not to disrupt the syntax of round (), square [] and curly brackets{}.\n"
 		formatted_dict = pprint.pformat(dict_of_presets, indent=4)
 		with open("greeblefier_GUI_files/presets.py", "w") as file:
 			file.write(prefix + "dict_of_presets = {" + "\n " +  formatted_dict[1:])
@@ -748,9 +757,8 @@ class Greeblefier(tk.Tk):
 		# Save the image to an in-memory file
 		output = io.BytesIO()
 		if self.checkbox_var.get() == 1:
-			if self.image and self.export_image_data:
-				image = Image.new("RGBA", self.image.size)
-				image.putdata(self.export_image_data)
+			if self.image:
+				image = self.export_image
 			else: return
 		elif self.checkbox_var.get() == 0:
 			if self.greebled_image:
@@ -829,7 +837,3 @@ class Greeblefier(tk.Tk):
 
 if __name__ == '__main__':
 	Greeblefier(default_zoom=4, maximize_window=True, ask_to_exit=True)
-
-
-
-
